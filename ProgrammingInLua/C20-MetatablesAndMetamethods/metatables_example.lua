@@ -11,7 +11,7 @@ print(getmetatable(t1))-- nil
 
 
 print("===========")
-print(getmetatable("hi")) -- table: 0x1676e50
+print(getmetatable("hi")) -- table: 0x1676e50 maybe String
 print(getmetatable("xix"))-- table: 0x1676e50
 print(getmetatable(10)) -- nil
 print(getmetatable(print)) -- nil
