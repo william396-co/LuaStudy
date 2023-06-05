@@ -11,3 +11,4 @@ end
 
 Account.deposit(Account, 200.0)
 Account:withdraw(100.0)
+print(Account.balance)
