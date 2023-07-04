@@ -1,0 +1,7 @@
+        syntax = "proto3";
+
+        package abc;
+        message Msg{
+                int32 id = 1;
+                string errmsg = 2;
+        }
