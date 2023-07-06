@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <utility>
 
-#if __cplusplus < 201703L //below c++17
+#if __cplusplus < 201703L // below c++17
 
 template<typename T>
 void print( T const & t )
@@ -13,10 +13,10 @@ void print( T const & t )
 }
 
 template<typename T, typename... Args>
-void print( T const & first, Args... args )
+void print( T const & first, Args &&... args )
 {
     std::cout << first;
-    print( args... );
+    print( std::forward<Args>( args )... );
 }
 
 inline void println()

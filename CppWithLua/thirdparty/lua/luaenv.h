@@ -1,7 +1,5 @@
 #pragma once
-
 #include <string>
-#include <pthread.h>
 #include "kaguya.hpp"
 
 // 添加lua路径
@@ -13,20 +11,18 @@ bool lua_addpath( kaguya::State * state, int32_t type, const std::string & path 
 class ILuaEnv
 {
 public:
-    ILuaEnv( const std::string & path );
+    ILuaEnv( const std::string & rootpath, std::string const & routinefile );
     virtual ~ILuaEnv();
     // 钩子(替换lua全局方法)
-    virtual void hook() = 0;
-    virtual void unhook() = 0;
+    virtual void hook() { }
+    virtual void unhook() {  }
     // 克隆
-    virtual ILuaEnv * clone() = 0;
+    virtual ILuaEnv * clone() { return nullptr; }
     // 注册
-    virtual void registering() = 0;
+    virtual void registering() {}
 
-public:
     // 初始化/销毁
     bool initialize();
-    void finalize();
 
     // 强制gc
     void gc2();
@@ -39,7 +35,6 @@ public:
     const std::string & root() const { return m_RootPath; }
     const std::string & routine() const { return m_Routine; }
 
-public:
     // 添加路径
     // package.path
     // package.cpath
@@ -50,11 +45,13 @@ public:
     void dostring( const std::string & script );
 
 protected:
+    void finalize();
+
     // 注册
     void initEnviroment();
     // 测试函数
     void helloworld( int32_t n );
-    // lua恐慌函数
+    // lua异常处理
     static int32_t panic( lua_State * L );
     // 异常函数
     static void exceptions( int code, const char * error );
@@ -69,46 +66,3 @@ protected:
     std::string m_RootPath;  // 根目录
     kaguya::State * m_State; // kaguya状态机
 };
-
-//
-// Lua环境中心
-// 支持脚本热更新
-//
-class LuaEnvCenter
-{
-public:
-    LuaEnvCenter();
-    ~LuaEnvCenter();
-
-    // 初始化和销毁
-    bool initialize( ILuaEnv * env );
-    void finalize();
-    // 热更新脚本环境
-    // 会阻塞到环境切换成功
-    bool reload();
-    // 如有需要, 切换环境
-    void rotate();
-    // 获取当前正在使用的脚本环境
-    ILuaEnv * env();
-
-private:
-    enum
-    {
-        eLuaEnvCenter_Normal = 1,
-        eLuaEnvCenter_Loading = 2,
-        eLuaEnvCenter_Rotate = 3
-    };
-
-    ILuaEnv * getUsed();
-    ILuaEnv * getLoad();
-
-private:
-    uint8_t m_Flag;
-    uint8_t m_UsedIndex;
-    uint8_t m_LoadIndex;
-
-    pthread_cond_t m_Cond;
-    pthread_mutex_t m_Mutex;
-    ILuaEnv * m_Envs[2];
-};
-
