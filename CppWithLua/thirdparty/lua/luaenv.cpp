@@ -1,10 +1,10 @@
-
 #include <cstdio>
 #include <cassert>
 #include <string>
 
 #include "luaenv.h"
 #include "../../utils/xtime.h"
+#include "../../utils/print.h"
 
 bool lua_addpath( kaguya::State * state, int32_t type, const std::string & path )
 {
@@ -40,31 +40,31 @@ bool lua_addpath( kaguya::State * state, int32_t type, const std::string & path 
     return state->dostring( newpath );
 }
 
-ILuaEnv::ILuaEnv( const std::string & path )
-    : m_Routine( path ),
+ILuaEnv::ILuaEnv( const std::string & rootpath, std::string const & routinefile )
+    : m_Routine( rootpath + "/" + routinefile ),
+      m_RootPath( rootpath ),
       m_State( nullptr )
 {
+    println( __PRETTY_FUNCTION__ );
 }
 
 ILuaEnv::~ILuaEnv()
 {
+    println( __PRETTY_FUNCTION__ );
+    finalize();
 }
 
 bool ILuaEnv::initialize()
 {
     m_State = new kaguya::State;
     if ( m_State == nullptr ) {
-        //    LOG_ERROR( "ILuaEnv::initialize() : new kaguya::State failed .\n" );
+        // LOG_ERROR( "ILuaEnv::initialize() : new kaguya::State failed .\n" );
         return false;
     }
 
     // 注册panic函数
     m_State->setErrorHandler( exceptions );
     lua_atpanic( m_State->state(), ILuaEnv::panic );
-
-    // 获取ROOT
-    //   std::string routine_file;
-    //    utils::PathUtils( m_Routine ).split( m_RootPath, routine_file );
 
     // 注册
     initEnviroment();
@@ -81,10 +81,7 @@ void ILuaEnv::finalize()
 {
     unhook();
 
-    if ( m_State ) {
-        delete m_State;
-        m_State = nullptr;
-    }
+    delete m_State;
 }
 
 void ILuaEnv::gc2()
@@ -182,132 +179,3 @@ std::vector<std::string> ILuaEnv::traverse( const std::string & path, const std:
     return files;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-LuaEnvCenter::LuaEnvCenter()
-    : m_Flag( eLuaEnvCenter_Normal ),
-      m_UsedIndex( 1 ),
-      m_LoadIndex( 0 )
-{
-    m_Envs[0] = nullptr;
-    m_Envs[1] = nullptr;
-
-    pthread_cond_init( &m_Cond, nullptr );
-    pthread_mutex_init( &m_Mutex, nullptr );
-}
-
-LuaEnvCenter::~LuaEnvCenter()
-{
-    m_LoadIndex = 0;
-    m_UsedIndex = 0;
-    m_Flag = eLuaEnvCenter_Normal;
-    pthread_cond_destroy( &m_Cond );
-    pthread_mutex_destroy( &m_Mutex );
-
-    for ( size_t i = 0; i < 2; ++i ) {
-        if ( m_Envs[i] != nullptr ) {
-            delete m_Envs[i];
-            m_Envs[i] = nullptr;
-        }
-    }
-}
-
-bool LuaEnvCenter::initialize( ILuaEnv * env )
-{
-    bool rc = false;
-
-    // 初始化
-    m_Envs[0] = env;
-    m_Envs[1] = env->clone();
-
-    m_Flag = eLuaEnvCenter_Loading;
-    rc = getLoad()->initialize();
-    m_Flag = eLuaEnvCenter_Rotate;
-
-    if ( rc ) {
-        rotate();
-        return true;
-    }
-
-    return false;
-}
-
-void LuaEnvCenter::finalize()
-{
-    for ( size_t i = 0; i < 2; ++i ) {
-        if ( m_Envs[i] != nullptr ) {
-            m_Envs[i]->finalize();
-        }
-    }
-}
-
-bool LuaEnvCenter::reload()
-{
-    pthread_mutex_lock( &m_Mutex );
-    if ( m_Flag != eLuaEnvCenter_Normal ) {
-        pthread_mutex_unlock( &m_Mutex );
-        return false;
-    }
-    m_Flag = eLuaEnvCenter_Loading;
-    pthread_mutex_unlock( &m_Mutex );
-
-    bool rc = getLoad()->initialize();
-    if ( !rc ) {
-        // 加载失败销毁加载的环境
-        getLoad()->finalize();
-        m_Flag = eLuaEnvCenter_Normal;
-        return false;
-    }
-
-    // 等待切换
-    // 正常的情况下待逻辑线程切换
-    pthread_mutex_lock( &m_Mutex );
-    m_Flag = eLuaEnvCenter_Rotate;
-    while ( m_Flag != eLuaEnvCenter_Normal ) {
-        pthread_cond_wait( &m_Cond, &m_Mutex );
-    }
-    pthread_mutex_unlock( &m_Mutex );
-
-    // 清空load环境
-    getLoad()->finalize();
-
-    return true;
-}
-
-ILuaEnv * LuaEnvCenter::env()
-{
-    return getUsed();
-}
-
-void LuaEnvCenter::rotate()
-{
-    if ( m_Flag != eLuaEnvCenter_Rotate ) {
-        return;
-    }
-
-    pthread_mutex_lock( &m_Mutex );
-
-    m_Flag = eLuaEnvCenter_Normal;
-    std::swap( m_UsedIndex, m_LoadIndex );
-    pthread_cond_signal( &m_Cond );
-
-    pthread_mutex_unlock( &m_Mutex );
-}
-
-ILuaEnv * LuaEnvCenter::getUsed()
-{
-    assert( m_UsedIndex < 2 && "LuaEnvCenter UsedIndex is Invalid" );
-    assert( m_UsedIndex != m_LoadIndex && "LuaEnvCenter Index is Same" );
-
-    return m_Envs[m_UsedIndex];
-}
-
-ILuaEnv * LuaEnvCenter::getLoad()
-{
-    assert( m_LoadIndex < 2 && "LuaEnvCenter LoadIndex is Invalid" );
-    assert( m_UsedIndex != m_LoadIndex && "LuaEnvCenter Index is Same" );
-
-    return m_Envs[m_LoadIndex];
-}
