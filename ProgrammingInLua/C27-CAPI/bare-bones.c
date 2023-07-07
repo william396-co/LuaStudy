@@ -1,10 +1,17 @@
 #include <stdio.h>
 #include <string.h>
+#ifdef ___cplusplus
+extern "C"
+{
+#endif
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include <stdarg.h>
 #include <stdlib.h>
+#ifdef __cplusplus
+}
+#endif
 
 /*
 void error( lua_State * L, const char * fmt, ... )
