@@ -4,7 +4,7 @@ TARGET_EXEC := $(APP).out
 
 BUILD_DIR := ./build
 SRC_DIRS := utils thirdparty src
-LIBS = -lpthread -llua -ldl
+LIBS = -lpthread -llua -ldl -lm
 
 # Find all the C and C++ files we want to compile
 # Note the single quotes around the * expressions. The shell will incorrectly expand these otherwise, but we want to send the * directly to the find command.
