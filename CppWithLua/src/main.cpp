@@ -14,7 +14,7 @@ void multi_luaState( int n );
 int main()
 {
 
-    multi_luaState( 3 );
+    multi_luaState( 1 );
     /*   std::unique_ptr<LuaEnv> luaEnv = std::make_unique<LuaEnv>( "scripts", "routine.lua" );
        if ( !luaEnv->initialize() ) {
            println( "LuaEnv initialize failed" );
