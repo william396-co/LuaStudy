@@ -1,5 +1,6 @@
 #include "luaenv.h"
 #include "abc.h"
+#include "def.h"
 #include "../thirdparty/lua/kaguya/kaguya.hpp"
 
 #include "../utils/print.h"
@@ -21,6 +22,13 @@ ILuaEnv * LuaEnv::clone()
 void LuaEnv::registering()
 {
     println( __PRETTY_FUNCTION__ );
+
+    // state()["Base"].setClass( kaguya::UserdataMetatable<Base>()
+    //                             .setConstructors<Base()>() );
+
+    state()["Derived"].setClass( kaguya::UserdataMetatable<Derived, Base>()
+                                     .setConstructors<Derived(), Derived( std::string const & )>()
+                                     .addFunction( "getTableName", &Derived::getTableName ) );
 
     state()["ABC"].setClass( kaguya::UserdataMetatable<ABC>()
                                  .setConstructors<ABC(), ABC( std::string const & )>()
