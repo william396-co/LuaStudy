@@ -12,7 +12,7 @@ int ABC::getRef()
     return cnt;
 }
 
-void ABC::bind( int id, Func && func )
+void ABC::bind( int id, Processor func )
 {
     auto it = funcMap.find( id );
     if ( it == funcMap.end() ) {

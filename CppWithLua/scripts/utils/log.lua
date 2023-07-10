@@ -41,7 +41,7 @@ local function _dump(t, out, head)
     call_stack = call_stack - 1
 end
 
-declare_global("log_dump")
+--declare_global("log_dump")
 function log_dump(head, content,t)
     -- 不需要二次判断print
     -- if get_global('print') == false then
