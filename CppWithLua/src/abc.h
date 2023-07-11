@@ -6,6 +6,7 @@
 #include <functional>
 #include <unordered_map>
 #include <string>
+#include <cstdlib>
 
 using lua_ref = kaguya::LuaRef;
 using lua_fn = kaguya::LuaFunction;
@@ -13,8 +14,6 @@ using cpp_fn = std::function<void( int, std::string const & )>;
 
 class ABC
 {
-    //    using lua_fn = kaguya::LuaFunction;
-    //  using cpp_fn = std::function<void( int, std::string const & )>;
 
     struct Processor
     {
@@ -26,22 +25,21 @@ class ABC
         };
 
     public:
-
         Processor( cpp_fn const & fn )
             : type( fn_type::cpp ), cppfn( fn ) {}
         Processor( lua_ref self, lua_fn fn )
-            : type( fn_type::lua), self( self ), luafn( fn ) {}
+            : type( fn_type::lua ),  self( self ), luafn( fn ) {}
         void operator()( int idx, std::string const & str )
         {
             switch ( type ) {
-                case fn_type::lua: luafn( idx, str ); break;
+                case fn_type::lua: luafn( self, idx, str ); break;
                 case fn_type::cpp: std::invoke( cppfn, idx, str ); break;
             }
         }
 
     private:
         fn_type type;
-        lua_ref self;
+            lua_ref self;
         lua_fn luafn;
         cpp_fn cppfn;
     };
@@ -78,17 +76,17 @@ public:
     }
 
     void bind( int id, cpp_fn const & pf );
-    void bind( int id, lua_ref const & ref, lua_fn const & pf );
+    void bind( int id,  lua_ref const & ref, lua_fn const & pf );
     void dataset( int id, std::string const & str )
     {
         data = str;
         println( __PRETTY_FUNCTION__, "(", id, ",", str, ")" );
     }
-    void process( int id )
+    void process( int id, int idx, std::string const & str )
     {
         auto it = funcMap.find( id );
         if ( it != funcMap.end() ) {
-            it->second( id, id == 1 ? "testXXXX" : "testYYYYY" );
+            it->second( idx, str );
         }
     }
 

@@ -34,7 +34,7 @@ void LuaEnv::registering()
                                  .addFunction( "update", &ABC::update )
                                  .addFunction( "getData", &ABC::getData )
                                  //        .addFunction( "bind", &ABC::bind )
-                                 .addOverloadedFunctions( "bind", static_cast<void ( ABC::* )( int, lua_ref const&, lua_fn const & )>( &ABC::bind ) )
+                                 .addOverloadedFunctions( "bind", static_cast<void ( ABC::* )( int,  lua_ref const&, lua_fn const & )>( &ABC::bind ) )
                                  .addFunction( "unbind", &ABC::unbind )
                                  .addFunction( "process", &ABC::process )
                                  .addOverloadedFunctions( "overload", &ABC::overload1, &ABC::overload2 ) );
