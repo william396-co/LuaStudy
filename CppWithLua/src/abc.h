@@ -1,11 +1,45 @@
 #pragma once
 
 #include "../utils/print.h"
+#include "../thirdparty/lua/kaguya/kaguya.hpp"
 
 #include <functional>
 #include <unordered_map>
+#include <string>
 
-using Func = std::function<void( int, std::string const & )>;
+struct Processor
+{
+    using cpp_fn = std::function<void( int idx, std::string const & str )>;
+
+    enum fn_type
+    {
+        cpp,
+        lua
+    };
+
+public:
+    Processor( cpp_fn fn )
+        : type( cpp ), cppfn( fn ) {}
+    Processor( kaguya::LuaFunction fn )
+        : type( lua ), luafn( fn ) {}
+
+    void operator()( int idx, std::string const & str )
+    {
+        switch ( type ) {
+            case cpp:
+                std::invoke( cppfn, idx, str );
+                break;
+            case lua:
+                luafn( idx, str );
+                break;
+        }
+    }
+
+private:
+    fn_type type;
+    kaguya::LuaFunction luafn;
+    cpp_fn cppfn;
+};
 
 class ABC
 {
@@ -35,14 +69,21 @@ public:
         data = d;
     }
 
-    void bind( int id, Func && func );
+    std::string const & getData() const
+    {
+        return data;
+    }
+    void bind( int id, Processor func );
 
-    template<typename... Args>
-    void execute( int id, Args &&... args )
+    void dataset( int id, std::string const & str )
+    {
+        println( __PRETTY_FUNCTION__, "(", id, ",", str, ")" );
+    }
+    void process( int id )
     {
         auto it = funcMap.find( id );
         if ( it != funcMap.end() ) {
-            ( it->second )( std::forward<Args>( args )... );
+            it->second( id, id==1? "testXXXX":"testYYYYY" );
         }
     }
 
@@ -54,6 +95,6 @@ public:
 
 private:
     std::string data;
-    std::unordered_map<int, Func> funcMap;
+    std::unordered_map<int, Processor> funcMap;
     static int cnt;
 };
