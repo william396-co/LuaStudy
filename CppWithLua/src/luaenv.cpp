@@ -27,13 +27,14 @@ void LuaEnv::registering()
                                      .setConstructors<Derived(), Derived( std::string const & )>()
                                      .addFunction( "getTableName", &Derived::getTableName ) );
 
-    state()["Processor"].setClass( kaguya::UserdataMetatable<Processor>().setConstructors<Processor( kaguya::LuaFunction )>() );
+    // state()["Processor"].setClass( kaguya::UserdataMetatable<Processor>().setConstructors<Processor( kaguya::LuaRef, kaguya::LuaFunction )>() );
 
     state()["ABC"].setClass( kaguya::UserdataMetatable<ABC>()
                                  .setConstructors<ABC(), ABC( std::string const & )>()
                                  .addFunction( "update", &ABC::update )
                                  .addFunction( "getData", &ABC::getData )
-                                 .addFunction( "bind", &ABC::bind )
+                                 //        .addFunction( "bind", &ABC::bind )
+                                 .addOverloadedFunctions( "bind", static_cast<void ( ABC::* )( int, lua_ref const&, lua_fn const & )>( &ABC::bind ) )
                                  .addFunction( "unbind", &ABC::unbind )
                                  .addFunction( "process", &ABC::process )
                                  .addOverloadedFunctions( "overload", &ABC::overload1, &ABC::overload2 ) );

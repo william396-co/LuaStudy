@@ -7,42 +7,45 @@
 #include <unordered_map>
 #include <string>
 
-struct Processor
-{
-    using cpp_fn = std::function<void( int idx, std::string const & str )>;
-
-    enum fn_type
-    {
-        cpp,
-        lua
-    };
-
-public:
-    Processor( cpp_fn fn )
-        : type( cpp ), cppfn( fn ) {}
-    Processor( kaguya::LuaFunction fn )
-        : type( lua ), luafn( fn ) {}
-
-    void operator()( int idx, std::string const & str )
-    {
-        switch ( type ) {
-            case cpp:
-                std::invoke( cppfn, idx, str );
-                break;
-            case lua:
-                luafn( idx, str );
-                break;
-        }
-    }
-
-private:
-    fn_type type;
-    kaguya::LuaFunction luafn;
-    cpp_fn cppfn;
-};
+using lua_ref = kaguya::LuaRef;
+using lua_fn = kaguya::LuaFunction;
+using cpp_fn = std::function<void( int, std::string const & )>;
 
 class ABC
 {
+    //    using lua_fn = kaguya::LuaFunction;
+    //  using cpp_fn = std::function<void( int, std::string const & )>;
+
+    struct Processor
+    {
+    private:
+        enum class fn_type
+        {
+            cpp,
+            lua
+        };
+
+    public:
+
+        Processor( cpp_fn const & fn )
+            : type( fn_type::cpp ), cppfn( fn ) {}
+        Processor( lua_ref self, lua_fn fn )
+            : type( fn_type::lua), self( self ), luafn( fn ) {}
+        void operator()( int idx, std::string const & str )
+        {
+            switch ( type ) {
+                case fn_type::lua: luafn( idx, str ); break;
+                case fn_type::cpp: std::invoke( cppfn, idx, str ); break;
+            }
+        }
+
+    private:
+        fn_type type;
+        lua_ref self;
+        lua_fn luafn;
+        cpp_fn cppfn;
+    };
+
 public:
     ABC()
         : data {}
@@ -73,17 +76,19 @@ public:
     {
         return data;
     }
-    void bind( int id, Processor func );
 
+    void bind( int id, cpp_fn const & pf );
+    void bind( int id, lua_ref const & ref, lua_fn const & pf );
     void dataset( int id, std::string const & str )
     {
+        data = str;
         println( __PRETTY_FUNCTION__, "(", id, ",", str, ")" );
     }
     void process( int id )
     {
         auto it = funcMap.find( id );
         if ( it != funcMap.end() ) {
-            it->second( id, id==1? "testXXXX":"testYYYYY" );
+            it->second( id, id == 1 ? "testXXXX" : "testYYYYY" );
         }
     }
 

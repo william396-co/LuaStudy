@@ -37,8 +37,9 @@ int main()
         luaEnv->state()["gABC"] = &gabc;
 
         using namespace std::placeholders;
-        gabc.bind(1,{std::bind(&ABC::dataset,&gabc,_1,_2)});
-        gabc.process(1);
+        gabc.bind( 1, { std::bind( &ABC::dataset, &gabc, _1, _2 ) } );
+        gabc.process( 1 );
+        println( "after process, gabc= ", gabc.getData() );
     }
 
     // 加载lua测试代码
