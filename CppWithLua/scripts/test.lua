@@ -13,24 +13,26 @@ bbHandler = ABC("bbHandler")
 
 local aa = Sign("aa",aaHandler)
 
---[[
-gABC:bind(2,self1,
-	function(idx, str)
-		print(self1.x,self1.y)
-		print("Lua dataset",idx,str);
-		gABC:update("DDDDDDDDDDDD===============")
-		print(gABC:getData())
-	end
-)
-gABC:process(2)]]
 
 
 local bb = Sign("bb",bbHandler)
-
+ccHandler = ABC("cchandler")
+local cc = Sign("cc",ccHandler)
 
 aaHandler:process(3,888,"aa sign data set handler")
 
+local sum = 0
+for i =0, 10 do
+	sum = sum + i
+end
+print(sum)
 bbHandler:process(3, 999, "bb sign data set handler")
+
+aaHandler:process(3,889,"aa sign data set handler")
+aaHandler:process(3,890,"aa sign data set handler")
+aaHandler:process(3,891,"aa sign data set handler")
+
+bbHandler:process(3, 1999, "bb sign data set handler")
 bb:output()
 aa:output()
 

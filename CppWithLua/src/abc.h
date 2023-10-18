@@ -32,7 +32,7 @@ class ABC
         void operator()( int idx, std::string const & str )
         {
             switch ( type ) {
-                case fn_type::lua: luafn( self, idx, str ); break;
+                case fn_type::lua: luafn(  idx, str ); break;
                 case fn_type::cpp: std::invoke( cppfn, idx, str ); break;
             }
         }

@@ -1,7 +1,7 @@
 local Sign= class("Sign")
 
 function Sign:ctor( name, handler)
-	handler:bind(3, self,function(self,id, str)
+	handler:bind(3, self,function(id, str)
 		print("process args",id,str)	
 		self.idx = id 
 		self.str = str
