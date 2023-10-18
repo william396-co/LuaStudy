@@ -35,6 +35,12 @@ local tablename = "Fight_Data"
 local def = Derived.new(tablename)
 local tmp = def:getTableName()
 print(tmp)
+print("def metatable ")
+print(getmetatable(def))
+print("abc1 metatable ")
+print(getmetatable(abc1))
+print("abc2 metatable ")
+print(getmetatable(abc2))
 
 -- abc1.overload()
 -- abc1.overload(1)
@@ -64,7 +70,7 @@ abc1 = nil
 abc2 = nil
 
 
-local req = msg.HeroLevelRequest(10,200);
-print(req.heroid);
-print(req.level);
+--local req = msg.HeroLevelRequest(10,200);
+--print(req.heroid);
+--print(req.level);
 

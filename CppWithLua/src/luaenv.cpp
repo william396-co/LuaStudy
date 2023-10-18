@@ -23,6 +23,8 @@ void LuaEnv::registering()
 {
     println( __PRETTY_FUNCTION__ );
 
+    state()["Base"].setClass(kaguya::UserdataMetatable<Base>());
+
     state()["Derived"].setClass( kaguya::UserdataMetatable<Derived, Base>()
                                      .setConstructors<Derived(), Derived( std::string const & )>()
                                      .addFunction( "getTableName", &Derived::getTableName ) );
