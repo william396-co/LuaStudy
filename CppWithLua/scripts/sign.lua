@@ -1,24 +1,24 @@
 local Sign= class("Sign")
 
-function Sign:ctor()
-	gHandler:bind(3, self, function(idx, str)
-		print("closure param",idx,str)	
-		self.idx = idx
+function Sign:ctor( name, handler)
+	handler:bind(3, self,function(id, str)
+		print("process args",id,str)	
+		self.idx = id 
 		self.str = str
-		print("==== bind callback=====================")
-		print(self.idx,self.str)
-		print("==== bind callback=====================")
+
+--		print("==== bind callback=====================")
+--		print(self.name,self.idx,self.str)
+--		print("==== bind callback=====================")
 
 	end)
+	self.name = name
 	self.idx =100
-	self.str = "Sign"
-	print("Sign constructor",self.idx,self.str)
+	print("Sign constructor[",self.name,self.idx,self.str,"]")
 end
 
 
 function Sign:output()
-	print(self.idx)
-	print(self.str)
+	print("Sign:output",self.name, self.idx,self.str)
 end
 
 return Sign

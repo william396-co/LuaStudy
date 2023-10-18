@@ -7,6 +7,10 @@ require 'utils.luautil'
 --require 'utils.log'
 require 'utils.xmath'
 
+local pb = require 'pb'
+local factory = require 'protocol/factory'
+local msg = factory:namescope()
+
 
 print("Hello kaguya from Lua")
 
@@ -60,4 +64,7 @@ abc1 = nil
 abc2 = nil
 
 
+local req = msg.HeroLevelRequest(10,200);
+print(req.heroid);
+print(req.level);
 

@@ -26,6 +26,7 @@ void ABC::bind( int id, lua_ref const & self, lua_fn const & pf )
     if ( it != funcMap.end() )
         funcMap.erase( it );
     funcMap.emplace( id, Processor { self, pf } );
+//    funcMap.emplace(id,pf);
 }
 
 void ABC::unbind( int id )

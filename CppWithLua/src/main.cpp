@@ -18,8 +18,8 @@ int defargfn( int a = 1, int b = 2, int c = 3 )
 
 int main()
 {
-
-    //   multi_luaState( 1 );
+     std::srand(std::time(nullptr));
+ //   multi_luaState( 1 );
     std::unique_ptr<ILuaEnv> luaEnv = std::make_unique<LuaEnv>( "scripts", "routine.lua" );
     if ( !luaEnv->initialize() ) {
         println( "LuaEnv initialize failed" );
@@ -38,7 +38,7 @@ int main()
 
         using namespace std::placeholders;
         gabc.bind( 1, { std::bind( &ABC::dataset, &gabc, _1, _2 ) } );
-        gabc.process( 1 );
+        gabc.process( 1 ,11111,"111111111111111111999999999999999999999");
         println( "after process, gabc= ", gabc.getData() );
     }
 

@@ -2,6 +2,7 @@
 #include <cassert>
 #include <string>
 
+#include "library.h"
 #include "luaenv.h"
 #include "../../utils/xtime.h"
 #include "../../utils/print.h"
@@ -146,7 +147,7 @@ void ILuaEnv::initEnviroment()
         { "_G", luaopen_base },
         // { "LUA_MATHLIBNAME", luaopen_math },
         // { "LUA_STRLIBNAME", luaopen_string },
-        // { "pb", luaopen_pb },
+         { "pb", luaopen_pb }
         // { "vec3", luaopen_vec3 },
         // { "rapidjson", luaopen_rapidjson }
     };
