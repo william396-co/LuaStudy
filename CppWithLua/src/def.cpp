@@ -1,6 +1,11 @@
 #include "def.h"
 #include "../utils/print.h"
 
+void Base::test()
+{
+    println( __PRETTY_FUNCTION__ );
+}
+
 Derived::~Derived()
 {
     println( __PRETTY_FUNCTION__ );

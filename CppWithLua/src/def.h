@@ -8,7 +8,7 @@ public:
     Base() {}
     virtual ~Base() {}
 
-    virtual void test() = 0;
+    virtual void test();
 };
 
 class Derived : public Base
@@ -18,7 +18,7 @@ public:
     Derived( std::string const & name );
     virtual ~Derived();
 
-    virtual void test() override;
+    virtual void test();
 
     std::string const & getTableName() const
     {
