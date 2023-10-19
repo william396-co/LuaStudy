@@ -23,8 +23,13 @@ void LuaEnv::registering()
 {
     println( __PRETTY_FUNCTION__ );
 
+    state()["Base"].setClass( kaguya::UserdataMetatable<Base>()
+                                  .setConstructors<Base()>()
+                                  .addFunction( "test", &Base::test ) );
+
     state()["Derived"].setClass( kaguya::UserdataMetatable<Derived, Base>()
                                      .setConstructors<Derived(), Derived( std::string const & )>()
+                                     .addFunction( "test", &Derived::test )
                                      .addFunction( "getTableName", &Derived::getTableName ) );
 
     // state()["Processor"].setClass( kaguya::UserdataMetatable<Processor>().setConstructors<Processor( kaguya::LuaRef, kaguya::LuaFunction )>() );
@@ -34,7 +39,7 @@ void LuaEnv::registering()
                                  .addFunction( "update", &ABC::update )
                                  .addFunction( "getData", &ABC::getData )
                                  //        .addFunction( "bind", &ABC::bind )
-                                 .addOverloadedFunctions( "bind", static_cast<void ( ABC::* )( int,  lua_ref const&, lua_fn const & )>( &ABC::bind ) )
+                                 .addOverloadedFunctions( "bind", static_cast<void ( ABC::* )( int, lua_ref const &, lua_fn const & )>( &ABC::bind ) )
                                  .addFunction( "unbind", &ABC::unbind )
                                  .addFunction( "process", &ABC::process )
                                  .addOverloadedFunctions( "overload", &ABC::overload1, &ABC::overload2 ) );
