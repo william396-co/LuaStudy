@@ -1,14 +1,19 @@
 #include "def.h"
 #include "../utils/print.h"
 
+Base::~Base()
+{
+    println( __PRETTY_FUNCTION__ );
+}
+/*
 void Base::test()
 {
     println( __PRETTY_FUNCTION__ );
 }
-
+*/
 Derived::~Derived()
 {
-    println( __PRETTY_FUNCTION__ );
+    println( __PRETTY_FUNCTION__, "(", tablename, ")" );
 }
 
 Derived::Derived( std::string const & name )

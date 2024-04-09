@@ -36,3 +36,29 @@ bbHandler:process(3, 1999, "bb sign data set handler")
 bb:output()
 aa:output()
 
+print("=============================================")
+local tablename = "Fight_Data1"
+local def = Derived.new(tablename)
+local tmp = def:getTableName()
+print(tmp)
+def:test()
+print("def metatable ")
+print(getmetatable(def))
+
+
+local d2 = gDataMgr:parse();
+print("d2 metatable")
+print(getmetatable(d2))
+print(d2:getTableName())
+
+
+
+print("gABC metatable")
+print(getmetatable(gABC))
+
+local abc = ABC.new()
+print("local abc metatable")
+print(getmetatable(abc))
+
+gDataMgr:insert(def)
+gDataMgr:destory(def)
