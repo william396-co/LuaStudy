@@ -30,10 +30,19 @@ int main()
     // 测试invoke function/function.call()
     {
         luaEnv->dofile( "scripts/call.lua" );
-        luaEnv->state()["call_test"]( "hello", "call test" );
-       // luaEnv->state()["call_test"].call<std::string, std::string>( "hello", "pcall" );
+        auto res = luaEnv->state()["call_test"]( "hello", "call test" );
+        if ( res.resultStatus() == 0 ) {
+            println( res.type() );
+        }
+        auto res2 = luaEnv->state()["call_test"].call<std::string, std::string>( "hello", "pcall" );
+       // if ( res2.resultStatus() == 0 ) {
+         //   println( res2.type() );
+//        }
         auto fn = luaEnv->state()["call_test"];
-        fn( "hello", "fn call" );
+        auto res3 = fn( "hello", "fn call" );
+        if ( res3.resultStatus() == 0 ) {
+            println( res3.type() );
+        }
     }
 
     // registering
