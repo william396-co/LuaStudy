@@ -2,6 +2,7 @@
 #include "../utils/xtime.h"
 #include "luaenv.h"
 #include "abc.h"
+#include "data_mgr.h"
 
 #include <cassert>
 #include <memory>
@@ -9,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <string>
 
 void multi_luaState( int n );
 int defargfn( int a = 1, int b = 2, int c = 3 )
@@ -18,12 +20,20 @@ int defargfn( int a = 1, int b = 2, int c = 3 )
 
 int main()
 {
-     std::srand(std::time(nullptr));
- //   multi_luaState( 1 );
+    std::srand( std::time( nullptr ) );
+    //   multi_luaState( 1 );
     std::unique_ptr<ILuaEnv> luaEnv = std::make_unique<LuaEnv>( "scripts", "routine.lua" );
     if ( !luaEnv->initialize() ) {
         println( "LuaEnv initialize failed" );
         return 1;
+    }
+    // 测试invoke function/function.call()
+    {
+        luaEnv->dofile( "scripts/call.lua" );
+        luaEnv->state()["call_test"]( "hello", "call test" );
+       // luaEnv->state()["call_test"].call<std::string, std::string>( "hello", "pcall" );
+        auto fn = luaEnv->state()["call_test"];
+        fn( "hello", "fn call" );
     }
 
     // registering
@@ -38,8 +48,11 @@ int main()
 
         using namespace std::placeholders;
         gabc.bind( 1, { std::bind( &ABC::dataset, &gabc, _1, _2 ) } );
-        gabc.process( 1 ,11111,"111111111111111111999999999999999999999");
+        gabc.process( 1, 11111, "111111111111111111999999999999999999999" );
         println( "after process, gabc= ", gabc.getData() );
+
+        DataMgr gDataMgr {};
+        luaEnv->state()["gDataMgr"] = &gDataMgr;
     }
 
     // 加载lua测试代码

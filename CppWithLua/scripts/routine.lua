@@ -43,10 +43,10 @@ print(getmetatable(abc1))
 print("abc2 metatable ")
 print(getmetatable(abc2))
 
-local b1 = Base.new();
-b1:test()
-print("b1 metatable ")
-print(getmetatable(b1))
+--local b1 = Base.new();
+-- b1:test()
+-- print("b1 metatable ")
+-- print(getmetatable(b1))
 
 -- abc1.overload()
 -- abc1.overload(1)

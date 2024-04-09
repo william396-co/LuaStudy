@@ -1,6 +1,7 @@
 #include "luaenv.h"
 #include "abc.h"
 #include "def.h"
+#include "data_mgr.h"
 #include "../thirdparty/lua/kaguya/kaguya.hpp"
 
 #include "../utils/print.h"
@@ -23,11 +24,17 @@ void LuaEnv::registering()
 {
     println( __PRETTY_FUNCTION__ );
 
-    state()["Base"].setClass( kaguya::UserdataMetatable<Base>()
-                                  .setConstructors<Base()>()
-                                  .addFunction( "test", &Base::test ) );
+    state()["DataMgr"].setClass( kaguya::UserdataMetatable<DataMgr>()
+                                     //                                     .setConstructors<DataMgr>()
+                                     .addFunction( "insert", &DataMgr::insert )
+                                     .addFunction( "destory", &DataMgr::destory )
+                                     .addFunction( "parse", &DataMgr::Parse ) );
 
-    state()["Derived"].setClass( kaguya::UserdataMetatable<Derived, Base>()
+    /*   state()["Base"].setClass( kaguya::UserdataMetatable<Base>()
+                                     .setConstructors<Base()>()
+                                     .addFunction( "test", &Base::test ) );*/
+
+    state()["Derived"].setClass( kaguya::UserdataMetatable<Derived>()
                                      .setConstructors<Derived(), Derived( std::string const & )>()
                                      .addFunction( "test", &Derived::test )
                                      .addFunction( "getTableName", &Derived::getTableName ) );
